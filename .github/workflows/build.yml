@@ -27,17 +27,14 @@ jobs:
         pip install --upgrade pip
         pip install cryptography tkinterdnd2 pyinstaller
 
-    - name: Locate tkinterdnd2 library asset path
-      id: tcl-path
+    - name: Create PyInstaller Hook
       run: |
-        PYTHON_SITE=$(python -c "import site; print(site.getsitepackages()[0])")
-        echo "site_packages=$PYTHON_SITE" >> $GITHUB_OUTPUT
+        echo "from PyInstaller.utils.hooks import collect_data_files" > hook-tkinterdnd2.py
+        echo "datas = collect_data_files('tkinterdnd2')" >> hook-tkinterdnd2.py
 
     - name: Compile Standalone Linux Binary
       run: |
-        pyinstaller --onefile --windowed \
-          --add-data "${{ steps.tcl-path.outputs.site_packages }}/tkinterdnd2:tkinterdnd2" \
-          deadbolt.py
+        pyinstaller --onefile --windowed --additional-hooks-dir=. deadbolt.py
 
     - name: Upload Linux Output
       uses: actions/upload-artifact@v4
@@ -61,19 +58,16 @@ jobs:
         python -m pip install --upgrade pip
         pip install cryptography tkinterdnd2 pyinstaller
 
-    - name: Locate tkinterdnd2 library asset path (Windows)
-      id: tcl-path-win
+    - name: Create PyInstaller Hook (Windows)
       shell: powershell
       run: |
-        $site = python -c "import site; print(site.getsitepackages()[0])"
-        echo "site_packages=$site" >> $env:GITHUB_OUTPUT
+        Set-Content -Path hook-tkinterdnd2.py -Value "from PyInstaller.utils.hooks import collect_data_files"
+        Add-Content -Path hook-tkinterdnd2.py -Value "datas = collect_data_files('tkinterdnd2')"
 
     - name: Compile Standalone Windows Executable
       shell: powershell
       run: |
-        pyinstaller --onefile --windowed `
-          --add-data "${{ steps.tcl-path-win.outputs.site_packages }}/tkinterdnd2;tkinterdnd2" `
-          deadbolt.py
+        pyinstaller --onefile --windowed --additional-hooks-dir=. deadbolt.py
 
     - name: Upload Windows Output
       uses: actions/upload-artifact@v4
