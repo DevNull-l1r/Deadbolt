@@ -12,7 +12,7 @@ It also adds a special safety tag (HMAC) to the file. This means if anyone tries
 Once locked, your file is saved in a brand new format: `.ppfbn`
 To get your file back, you just drop that `.ppfbn` file back into the app, type your password, and click unlock. 
 
-## Warning
+## WARNING
 
 ### Deadbolt is completely private and local.
 ### It does not save your passwords anywhere.
