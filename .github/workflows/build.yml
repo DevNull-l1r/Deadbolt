@@ -24,17 +24,12 @@ jobs:
 
     - name: Install Python Dependencies
       run: |
-        pip install --upgrade pip
+        python -m pip install --upgrade pip
         pip install cryptography tkinterdnd2 pyinstaller
-
-    - name: Create PyInstaller Hook
-      run: |
-        echo "from PyInstaller.utils.hooks import collect_data_files" > hook-tkinterdnd2.py
-        echo "datas = collect_data_files('tkinterdnd2')" >> hook-tkinterdnd2.py
 
     - name: Compile Standalone Linux Binary
       run: |
-        pyinstaller --onefile --windowed --additional-hooks-dir=. deadbolt.py
+        pyinstaller --onefile --windowed --collect-data tkinterdnd2 deadbolt.py
 
     - name: Upload Linux Output
       uses: actions/upload-artifact@v4
@@ -58,16 +53,10 @@ jobs:
         python -m pip install --upgrade pip
         pip install cryptography tkinterdnd2 pyinstaller
 
-    - name: Create PyInstaller Hook (Windows)
-      shell: powershell
-      run: |
-        Set-Content -Path hook-tkinterdnd2.py -Value "from PyInstaller.utils.hooks import collect_data_files"
-        Add-Content -Path hook-tkinterdnd2.py -Value "datas = collect_data_files('tkinterdnd2')"
-
     - name: Compile Standalone Windows Executable
       shell: powershell
       run: |
-        pyinstaller --onefile --windowed --additional-hooks-dir=. deadbolt.py
+        pyinstaller --onefile --windowed --collect-data tkinterdnd2 deadbolt.py
 
     - name: Upload Windows Output
       uses: actions/upload-artifact@v4
