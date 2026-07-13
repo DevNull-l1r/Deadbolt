@@ -1,0 +1,82 @@
+name: Compile Deadbolt Binaries
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build-linux:
+    runs-on: ubuntu-24.04
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    - name: Install System Dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y python3-tk python3-pip
+
+    - name: Install Python Dependencies
+      run: |
+        pip install --upgrade pip
+        pip install cryptography tkinterdnd2 pyinstaller
+
+    - name: Locate tkinterdnd2 library asset path
+      id: tcl-path
+      run: |
+        PYTHON_SITE=$(python -c "import site; print(site.getsitepackages()[0])")
+        echo "site_packages=$PYTHON_SITE" >> $GITHUB_OUTPUT
+
+    - name: Compile Standalone Linux Binary
+      run: |
+        pyinstaller --onefile --windowed \
+          --add-data "${{ steps.tcl-path.outputs.site_packages }}/tkinterdnd2:tkinterdnd2" \
+          deadbolt.py
+
+    - name: Upload Linux Output
+      uses: actions/upload-artifact@v4
+      with:
+        name: deadbolt-linux-x64
+        path: dist/deadbolt
+
+  build-windows:
+    runs-on: windows-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    - name: Install Python Dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install cryptography tkinterdnd2 pyinstaller
+
+    - name: Locate tkinterdnd2 library asset path (Windows)
+      id: tcl-path-win
+      shell: powershell
+      run: |
+        $site = python -c "import site; print(site.getsitepackages()[0])"
+        echo "site_packages=$site" >> $env:GITHUB_OUTPUT
+
+    - name: Compile Standalone Windows Executable
+      shell: powershell
+      run: |
+        pyinstaller --onefile --windowed `
+          --add-data "${{ steps.tcl-path-win.outputs.site_packages }}/tkinterdnd2;tkinterdnd2" `
+          deadbolt.py
+
+    - name: Upload Windows Output
+      uses: actions/upload-artifact@v4
+      with:
+        name: deadbolt-windows-x64
+        path: dist/deadbolt.exe
