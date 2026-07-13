@@ -1,7 +1,7 @@
 # Deadbolt
 ## By Null
 
-Deadbolt is a simple app that lets you lock down your files with high-grade encryption.
+Deadbolt is a simple app that lets you lock down your files with "high-grade" encryption.
 You simply just choose the file in the app or drag and drag to lock or unlock them.
 
 ## How it Works
