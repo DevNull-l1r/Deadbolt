@@ -6,7 +6,7 @@ You simply just choose the file in the app or drag and drag to lock or unlock th
 
 ## How it Works
 
-When you drag a file in and set a password, Deadbolt scrambles it using AES-256 encryption.
+When you put a file in and set a password, Deadbolt scrambles it using AES-256 encryption.
 It also adds a special safety tag (HMAC) to the file. This means if anyone tries to mess with the file's data while it's locked, the app will know and refuse to open it.
 
 Once locked, your file is saved in a brand new format: `.ppfbn`
